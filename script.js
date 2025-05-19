@@ -17,13 +17,7 @@ domReady(function () {
 
       showQrScanner();
 
-    // Login button event
-        const username = "microservice@smartlogisticsinc.com.fullcopy";
-        const password = "xEOqcG38kzmuqXfdee0WYyS1in1fJmsF0kxW";
-
-        // Make POST request to get the token from proxy server
-        
-            getAccessToken(username, password);
+      getAccessToken();
     });
 
 // Show login form
@@ -50,10 +44,8 @@ function showQrScanner() {
 }
 
 // Function to make a POST request to proxy server to get the OAuth token
-function getAccessToken(username, password) {
-   // const url = 'http://localhost:3000/get-token';  // Proxy server URL
-   const url = 'https://test.salesforce.com/services/oauth2/token?grant_type=password&client_id=3MVG9xfrbKQ6hBytnC5pEE29nNvV2.GaJNKRVgGTanftKWrLeSbvXqzNBXcLGI0uWpAH1YAM6AnOSFK.LEOn8&client_secret=C9D17FF8ADC717AAC65F0FEE4AF3732F6B4D472B756C1DF7A02C26AF292083B5&username=microservice@smartlogisticsinc.com.fullcopy&password=xEOqcG38kzmuqXfdee0WYyS1in1fJmsF0kxW';
-
+function getAccessToken() {
+    const url = 'http://localhost:3000/get-token';  // Proxy server URL
     // Send the username and password to proxy server
     fetch(url, {
         method: 'POST',
