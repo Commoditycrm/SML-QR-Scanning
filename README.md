@@ -2,7 +2,7 @@
 ## 1. 
 Pull the code from repo to dev.
 ## 2.
-Use npm i in terminal to install dependencies.
+Use "npm i --global http-server" in terminal to install dependencies.
 ## 3.
 run using "http-server"
 ## 4.
