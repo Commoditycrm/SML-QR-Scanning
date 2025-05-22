@@ -34,7 +34,7 @@ function showQrScanner() {
 
 // Function to make a POST request to proxy server to get the OAuth token
 function getAccessToken() {
-    const url = 'http://localhost:3000/get-token';  // Proxy server URL
+    const url = 'https://sml-qr-scanning-production.up.railway.app/get-token';//'http://localhost:3000/get-token';  // Proxy server URL
     // Send the username and password to proxy server
     fetch(url, {
         method: 'POST',
