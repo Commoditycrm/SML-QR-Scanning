@@ -1,101 +1,123 @@
 function domReady(fn) {
-    if (
-        document.readyState === "complete" ||
-        document.readyState === "interactive"
-    ) {
-        setTimeout(fn, 1000);
-    } else {
-        document.addEventListener("DOMContentLoaded", fn);
-    }
+  if (
+    document.readyState === "complete" ||
+    document.readyState === "interactive"
+  ) {
+    setTimeout(fn, 1000);
+  } else {
+    document.addEventListener("DOMContentLoaded", fn);
+  }
 }
 
 domReady(function () {
-      showQrScanner();
-      getAccessToken();
-    });
+  const qrToken = localStorage.getItem("qrToken");
+  const tokenExpiry = localStorage.getItem("tokenExpiry");
+  const currentTime = new Date().getTime();
 
+  if (!qrToken || !tokenExpiry || currentTime > tokenExpiry) {
+    getAccessToken(); // If the token is expired or missing, request a new one
+  } else {
+    showQrScanner(); // If the token is valid, show the QR scanner
+  }
+});
 
 // Show QR Scanner
 function showQrScanner() {
-    document.getElementById("qr-section").style.display = "block";
+  document.getElementById("qr-section").style.display = "block"; // Show the QR scanner section
+  document.getElementById("scan-another-btn").style.display = "none"; // Hide the "Scan Another QR" button initially
 
-    // QR scanner logic (same as before)
-    function onScanSuccess(decodeText, decodeResult) {
-        const deviceId = decodeText.split(',')[0];
-        fetchDataFromApex(deviceId);
-    }
+  // Create a new scanner instance
+  const qrboxSize =
+    window.innerWidth > 600 ? 250 : Math.floor(window.innerWidth * 0.8); // 80% of screen width for mobile
+  const htmlscanner = new Html5QrcodeScanner("my-qr-reader", {
+    fps: 10,
+    qrbox: qrboxSize,
+  });
 
-    let htmlscanner = new Html5QrcodeScanner(
-        "my-qr-reader",
-        { fps: 10, qrbox: 250 }
-    );
-    htmlscanner.render(onScanSuccess);
+  // QR scanner logic
+  function onScanSuccess(decodeText, decodeResult) {
+    const deviceId = decodeText.split(",")[0]; // Extract the deviceId from the QR code text
+    fetchDataFromApex(deviceId); // Fetch the data from Apex
+
+    // Stop scanning after a successful scan
+    htmlscanner.clear(); // Stop the scanner
+    document.getElementById("scan-another-btn").style.display = "block"; // Show "Scan Another QR" button
+  }
+
+  // Start scanning
+  htmlscanner.render(onScanSuccess);
 }
 
 // Function to make a POST request to proxy server to get the OAuth token
 function getAccessToken() {
-    const url = 'https://sml-qr-scanning-production.up.railway.app/get-token';//'http://localhost:3000/get-token';  // Proxy server URL
-    // Send the username and password to proxy server
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        }
+  const url = "https://sml-qr-scanning-production.up.railway.app/get-token"; // Proxy server URL for getting token
+
+  // Send a POST request to get the access token
+  fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.access_token) {
+        // Save token and expiry time in localStorage
+        const tokenExpiry = new Date().getTime() + 3600 * 1000; // Set expiry time as 1 hour
+        localStorage.setItem("qrToken", data.access_token);
+        localStorage.setItem("tokenExpiry", tokenExpiry);
+        showQrScanner(); // Show the QR scanner after successful login
+      } else {
+        alert("Failed to authenticate. Please check your credentials.");
+      }
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.access_token) {
-            // Save token and expiry time in localStorage
-            localStorage.setItem("qrToken", data.access_token);
-            showQrScanner();  // Show the QR scanner after successful login
-        } else {
-            alert("Failed to authenticate. Please check your credentials.");
-        }
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        alert("An error occurred while trying to authenticate.");
+    .catch((error) => {
+      console.error("Error:", error);
+      alert("An error occurred while trying to authenticate.");
     });
 }
 
 // Fetch data from Apex class using deviceId and display it
 function fetchDataFromApex(deviceId) {
-    const endpoint = `https://smartlogisticsinc--fullcopy.sandbox.my.salesforce-sites.com/services/apexrest/qrScanner/?deviceId=${deviceId}`;
-    const qrToken = localStorage.getItem("qrToken");
+  const endpoint = `https://smartlogisticsinc--fullcopy.sandbox.my.salesforce-sites.com/services/apexrest/qrScanner/?deviceId=${deviceId}`;
+  const qrToken = localStorage.getItem("qrToken");
 
-    fetch(endpoint, {
-        method: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + qrToken
-        }
+  fetch(endpoint, {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + qrToken, // Include the token in the request header
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      displayData(data); // Display the data retrieved from Apex
     })
-    .then(response => response.json())
-    .then(data => {
-        displayData(data);
-    })
-    .catch(error => {
-        console.error("Error:", error);
+    .catch((error) => {
+      console.error("Error:", error);
     });
 }
 
 // Display fetched data on the screen
 function displayData(data) {
   const dataContainer = document.getElementById("my-qr-reader");
+
   if (data.length > 0) {
     const device = data[0];
     const utcDate = new Date(device.Last_Connected__c);
 
-    // Convert to CST/CDT (Central Time - auto handles DST)
+    // Convert UTC time to CST/CDT (Central Time)
     const options = {
-      timeZone: 'America/Chicago',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
+      timeZone: "America/Chicago",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
     };
-    const formattedDate = new Intl.DateTimeFormat('en-US', options).format(utcDate);
+    const formattedDate = new Intl.DateTimeFormat("en-US", options).format(
+      utcDate
+    );
 
     dataContainer.innerHTML = `
       <div class="device-info">
@@ -108,6 +130,16 @@ function displayData(data) {
       </div>
     `;
   } else {
-    dataContainer.innerHTML = "<p class='no-data'>No data found for the scanned device.</p>";
+    dataContainer.innerHTML =
+      "<p class='no-data'>No data found for the scanned device.</p>";
   }
 }
+
+// Handle "Scan Another QR" button click
+document
+  .getElementById("scan-another-btn")
+  .addEventListener("click", function () {
+    // Hide the "Scan Another QR" button and show the QR scanner again
+    document.getElementById("scan-another-btn").style.display = "none";
+    showQrScanner(); // Show the QR scanner to scan another QR code
+  });
