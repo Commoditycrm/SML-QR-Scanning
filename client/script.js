@@ -40,8 +40,15 @@ function showQrScanner() {
     fetchDataFromApex(deviceId); // Fetch the data from Apex
 
     // Stop scanning after a successful scan
-    htmlscanner.clear(); // Stop the scanner
-    document.getElementById("scan-another-btn").style.display = "block"; // Show "Scan Another QR" button
+    htmlscanner
+      .clear()
+      .then(() => {
+        document.getElementById("scan-another-btn").style.display = "block";
+      })
+      .catch((error) => {
+        console.warn("Clear failed:", error);
+        document.getElementById("scan-another-btn").style.display = "block";
+      });
   }
 
   // Start scanning
@@ -99,7 +106,8 @@ function fetchDataFromApex(deviceId) {
 
 // Display fetched data on the screen
 function displayData(data) {
-  const dataContainer = document.getElementById("my-qr-reader");
+  const dataContainer = document.getElementById("result-container");
+  if (!dataContainer) return;
 
   if (data.length > 0) {
     const device = data[0];
