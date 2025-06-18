@@ -11,13 +11,15 @@ function domReady(fn) {
 
 domReady(function () {
   const qrToken = localStorage.getItem("qrToken");
-  const tokenExpiry = localStorage.getItem("tokenExpiry");
-  const currentTime = new Date().getTime();
+  const tokenExpiry = parseInt(localStorage.getItem("tokenExpiry"), 10);
+  const currentTime = Date.now();
 
-  if (!qrToken || !tokenExpiry || currentTime > tokenExpiry) {
-    getAccessToken(); // If the token is expired or missing, request a new one
+  if (!qrToken || isNaN(tokenExpiry) || currentTime > tokenExpiry) {
+    console.info("Fetching new token from server...");
+    getAccessToken();
   } else {
-    showQrScanner(); // If the token is valid, show the QR scanner
+    console.info("Using valid cached token");
+    showQrScanner();
   }
 });
 
@@ -32,6 +34,9 @@ function showQrScanner() {
   const htmlscanner = new Html5QrcodeScanner("my-qr-reader", {
     fps: 10,
     qrbox: qrboxSize,
+    experimentalFeatures: {
+    useBarCodeDetectorIfSupported: true
+    }
   });
 
   // QR scanner logic
@@ -106,7 +111,7 @@ function fetchDataFromApex(deviceId) {
 
 // Display fetched data on the screen
 function displayData(data) {
-  const dataContainer = document.getElementById("result-container");
+  const dataContainer = document.getElementById("my-qr-reader");
   if (!dataContainer) return;
 
   if (data.length > 0) {
