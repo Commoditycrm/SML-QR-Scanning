@@ -45,7 +45,6 @@ function showQrScanner() {
     fetchDataFromApex(deviceId); // Fetch the data from Apex
 
     // Stop scanning after a successful scan
-    setTimeout(() => {
     htmlscanner
       .clear()
       .then(() => {
@@ -55,10 +54,14 @@ function showQrScanner() {
         console.warn("Clear failed:", error.message);
         document.getElementById("scan-another-btn").style.display = "block";
       });
-    }, 500);
   }
 
   // Start scanning
+  const readerElement = document.getElementById("my-qr-reader");
+  if (readerElement) {
+  readerElement.innerHTML = ""; // force clean container before render
+  }
+
   htmlscanner.render(onScanSuccess);
 }
 
