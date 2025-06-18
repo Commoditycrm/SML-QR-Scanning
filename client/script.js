@@ -45,15 +45,17 @@ function showQrScanner() {
     fetchDataFromApex(deviceId); // Fetch the data from Apex
 
     // Stop scanning after a successful scan
+    setTimeout(() => {
     htmlscanner
       .clear()
       .then(() => {
         document.getElementById("scan-another-btn").style.display = "block";
       })
       .catch((error) => {
-        console.warn("Clear failed:", error);
+        console.warn("Clear failed:", error.message);
         document.getElementById("scan-another-btn").style.display = "block";
       });
+    }, 500);
   }
 
   // Start scanning
