@@ -10,8 +10,8 @@ function domReady(fn) {
 }
 
 domReady(function () {
-  const qrToken = localStorage.getItem("qrToken");
-  const tokenExpiry = parseInt(localStorage.getItem("tokenExpiry"), 10);
+  const qrToken = sessionStorage.getItem("qrToken");
+  const tokenExpiry = parseInt(sessionStorage.getItem("tokenExpiry"), 10);
   const currentTime = Date.now();
 
   if (!qrToken || isNaN(tokenExpiry) || currentTime > tokenExpiry) {
@@ -45,6 +45,7 @@ function showQrScanner() {
     fetchDataFromApex(deviceId); // Fetch the data from Apex
 
     // Stop scanning after a successful scan
+    setTimeout(() => {
     htmlscanner
       .clear()
       .then(() => {
@@ -54,6 +55,7 @@ function showQrScanner() {
         console.warn("Clear failed:", error.message);
         document.getElementById("scan-another-btn").style.display = "block";
       });
+    }, 500);
   }
 
   // Start scanning
@@ -81,8 +83,8 @@ function getAccessToken() {
       if (data.access_token) {
         // Save token and expiry time in localStorage
         const tokenExpiry = new Date().getTime() + 3600 * 1000; // Set expiry time as 1 hour
-        localStorage.setItem("qrToken", data.access_token);
-        localStorage.setItem("tokenExpiry", tokenExpiry);
+        sessionStorage.setItem("qrToken", data.access_token);
+        sessionStorage.setItem("tokenExpiry", tokenExpiry);
         showQrScanner(); // Show the QR scanner after successful login
       } else {
         alert("Failed to authenticate. Please check your credentials.");
@@ -97,7 +99,7 @@ function getAccessToken() {
 // Fetch data from Apex class using deviceId and display it
 function fetchDataFromApex(deviceId) {
   const endpoint = `https://smartlogisticsinc--fullcopy.sandbox.my.salesforce-sites.com/services/apexrest/qrScanner/?deviceId=${deviceId}`;
-  const qrToken = localStorage.getItem("qrToken");
+  const qrToken = sessionStorage.getItem("qrToken");
 
   fetch(endpoint, {
     method: "GET",
