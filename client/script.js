@@ -30,7 +30,7 @@ function showQrScanner() {
 
   // Create a new scanner instance
   const qrboxSize =
-    window.innerWidth > 600 ? 250 : Math.floor(window.innerWidth * 0.9); // 80% of screen width for mobile
+    window.innerWidth > 600 ? 250 : Math.floor(window.innerWidth * 0.8); // 80% of screen width for mobile
   const htmlscanner = new Html5QrcodeScanner("my-qr-reader", {
     fps: 10,
     qrbox: qrboxSize,
@@ -56,12 +56,6 @@ function showQrScanner() {
         document.getElementById("scan-another-btn").style.display = "block";
       });
     }, 500);
-  }
-
-  // Start scanning
-  const readerElement = document.getElementById("my-qr-reader");
-  if (readerElement) {
-  readerElement.innerHTML = ""; // force clean container before render
   }
 
   htmlscanner.render(onScanSuccess);
