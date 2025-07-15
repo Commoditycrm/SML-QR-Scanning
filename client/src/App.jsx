@@ -202,7 +202,7 @@ export default function App() {
 
           scannerRef.current
             .start(cameraConfig, scanOptions, (decodedText) => {
-              setSuccessMessage("QR code detected successfully");
+              setSuccessMessage("Barcode detected successfully");
               const deviceId = decodedText.split(",")[0]; // Extract the deviceId from the QR code text
               fetchDataFromApex(deviceId);
             })
@@ -223,7 +223,7 @@ export default function App() {
 
   return (
     <div className="container">
-      <h2>SML QR Scanner</h2>
+      <img src="https://smartlogisticsinc.my.site.com/servlet/servlet.ImageServer?id=0150h000004F2SG&oid=00Df4000000nCJh&lastMod=1546601777000" alt="logo" className="s" />
       {scanError && <p className="no-data">{scanError}</p>}
 
       <div id="qr-reader" style={{ width: "100%" }} ref={qrRef} />
