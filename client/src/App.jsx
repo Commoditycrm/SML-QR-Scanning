@@ -43,7 +43,7 @@ export default function App() {
   }, []);
 
   function getAccessToken() {
-    const url = "https://sml-qr-scanning-psi.vercel.app/get-token"; // Proxy server URL for getting token
+    const url = "https://sml-qr-scanning.vercel.app/get-token"; // Proxy server URL for getting token
 
     // Send a POST request to get the access token
     fetch(url, {
