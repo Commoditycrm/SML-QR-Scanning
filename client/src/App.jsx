@@ -104,6 +104,8 @@ export default function App() {
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log(data);
+        
         const utcDate = new Date(data[0].Last_Connected__c);
 
         // Convert UTC time to CST/CDT (Central Time)
