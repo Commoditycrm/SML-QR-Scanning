@@ -93,7 +93,7 @@ export default function App() {
   };
 
   function fetchDataFromApex(deviceId) {
-    const endpoint = `https://smartlogisticsinc--fullcopy.sandbox.my.salesforce-sites.com/services/apexrest/qrScanner/?deviceId=${deviceId}`;
+    const endpoint = `https://smartlogisticsinc.my.salesforce-sites.com/services/apexrest/qrScanner/?deviceId=${deviceId}`;
     const qrToken = sessionStorage.getItem("qrToken");
 
     fetch(endpoint, {
